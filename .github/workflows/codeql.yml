@@ -1,45 +1,24 @@
-name: "CodeQL"
+name: "Java Build"
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-
-    branches: [ "main" ]
-  schedule:
-    - cron: '29 0 * * 0'
 
 jobs:
-  analyze:
-    name: Analyze
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'java' ]
-
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+    - name: Set up Java JDK
+      uses: actions/setup-java@v1
       with:
-        languages: ${{ matrix.language }}
+        java-version: '11'
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        # Specify the directories to include in the analysis
-        paths: ghas_demo_v2/
-        # Use the 'category' parameter to indicate that we're analyzing Java code
-        category: "Java"
+    - name: Build with Gradle
+      run: |
+        chmod +x gradlew
+        ./gradlew build
